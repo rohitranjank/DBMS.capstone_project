@@ -1,0 +1,6 @@
+node_modules
+dist
+.env
+backend/venv
+backend/static_dist
+__pycache__

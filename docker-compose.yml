@@ -1,0 +1,27 @@
+services:
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_DATABASE: campus_complaints
+      MYSQL_USER: campus
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes: [dbdata:/var/lib/mysql]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${DB_PASSWORD}"]
+      interval: 5s
+      retries: 20
+  app:
+    build: .
+    ports: ["5000:5000"]
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      SECRET_KEY: ${SECRET_KEY}
+      DATABASE_URL: mysql+pymysql://campus:${DB_PASSWORD}@db:3306/campus_complaints
+      FRONTEND_ORIGIN: http://localhost:5000
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+volumes:
+  dbdata:
